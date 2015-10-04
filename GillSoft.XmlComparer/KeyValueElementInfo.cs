@@ -5,18 +5,18 @@ using System.Text;
 
 namespace GillSoft.XmlComparer
 {
-    public class KeyValueInfo
+    public class KeyValueElementInfo
     {
         public List<string> KeyNames { get; private set; }
 
         public string ValueName { get; private set; }
 
-        public KeyValueInfo(string keyName, string valueName = null)
+        public KeyValueElementInfo(string keyName, string valueName = null)
             : this(new[] { keyName }, valueName)
         {
         }
 
-        public KeyValueInfo(string[] keyNames, string valueName = null)
+        public KeyValueElementInfo(string[] keyNames, string valueName = null)
         {
             this.KeyNames = new List<string>();
             this.KeyNames.AddRange(keyNames);

@@ -42,7 +42,7 @@
     <Compile Include="Common.cs" />
     <Compile Include="Comparer.cs" />
     <Compile Include="IXmlCompareHandler.cs" />
-    <Compile Include="KeyValueInfo.cs" />
+    <Compile Include="KeyValueElementInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XmlExtensionMethods.cs" />
     <Compile Include="XmlNamespaceManagerEnhanced.cs" />

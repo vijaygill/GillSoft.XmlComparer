@@ -50,7 +50,7 @@ namespace GillSoft.XmlComparer
         }
 
 
-        public static string GetXPath(this XElement element, KeyValueInfo keyValueInfo)
+        public static string GetXPath(this XElement element, KeyValueElementInfo keyValueInfo)
         {
             if (element == null)
                 return string.Empty;
@@ -78,9 +78,9 @@ namespace GillSoft.XmlComparer
             return res;
         }
 
-        internal static KeyValueInfo GetBestKeyValueInfo(this XElement element)
+        internal static KeyValueElementInfo GetBestKeyValueInfo(this XElement element)
         {
-            var res = default(KeyValueInfo);
+            var res = default(KeyValueElementInfo);
             if (element != null)
             {
                 var attribNames = element.GetAttributes().Select(a => a.Name.LocalName).ToList();
