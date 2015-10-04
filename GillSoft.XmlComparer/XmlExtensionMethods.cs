@@ -16,18 +16,23 @@ namespace GillSoft.XmlComparer
             if (element == null)
                 return string.Empty;
 
-            var prefix = string.Empty;
+            var ns = element.Name.NamespaceName;
+            var prefix = element.Document.Root.GetPrefixOfNamespace(ns);
 
-            var ns = element.GetDefaultNamespace();
-            if (ns == element.Document.Root.GetDefaultNamespace())
+            if (string.IsNullOrWhiteSpace(prefix))
             {
-                prefix = element.Document.Root.GetPrefixOfNamespace(ns);
-                if (string.IsNullOrWhiteSpace(prefix))
+                var nsRoot = element.Document.Root.GetDefaultNamespace().NamespaceName;
+                if (!string.IsNullOrWhiteSpace(nsRoot))
                 {
-                    prefix = Common.DefaultNamespace;
+                    if (string.IsNullOrWhiteSpace(prefix) && nsRoot.Equals(ns))
+                    {
+                        prefix = Common.DefaultNamespace;
+                    }
                 }
-                prefix = prefix + ":";
             }
+
+            if (!string.IsNullOrWhiteSpace(prefix))
+                prefix = prefix + ":";
 
             return prefix + element.Name.LocalName;
         }
@@ -38,7 +43,7 @@ namespace GillSoft.XmlComparer
 
             if (element != null)
             {
-                res.AddRange(element.Attributes().Where(a => a.Name.LocalName != "xmlns"));
+                res.AddRange(element.Attributes().Where(a => !a.ToString().StartsWith("xmlns")));
             }
 
             return res;
@@ -54,7 +59,7 @@ namespace GillSoft.XmlComparer
 
             if (useAllAttributesAsFilter && element.GetAttributes().Any())
             {
-                var filter = "[" + string.Join(" and ", element.GetAttributes().Select(a => "@" + a.Name + "=" + "\"" + a.Value.XmlEncode() + "\"")) + "]";
+                var filter = "[" + string.Join(" and ", element.GetAttributes().Select(a => "@" + a.Name.LocalName + "=" + "\"" + a.Value.XmlEncode() + "\"")) + "]";
                 res += filter;
             }
 

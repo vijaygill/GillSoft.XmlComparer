@@ -43,8 +43,23 @@ namespace GillSoft.XmlComparer
             {
                 //Console.WriteLine(item.XPath);
                 // compare elements in both documents
-                var node1 = doc1.XPathSelectElement(item.XPath, nsm1);
-                var node2 = doc2.XPathSelectElement(item.XPath, nsm2);
+
+                var node1 = default(XElement);
+                try
+                {
+                    node1 = doc1.XPathSelectElements(item.XPath, nsm1).FirstOrDefault();
+                }
+                catch
+                {
+                }
+                var node2 = default(XElement);
+                try
+                {
+                    node2 = doc2.XPathSelectElements(item.XPath, nsm2).FirstOrDefault();
+                }
+                catch
+                {
+                }
 
                 if (node1 == null && node2 != null)
                 {
@@ -91,8 +106,54 @@ namespace GillSoft.XmlComparer
 
         private void CompareAttributes(XElement node1, XElement node2, IXmlCompareHandler callback)
         {
-            var attribsAll = node1.Attributes().ToList();
-            attribsAll.AddRange(node2.Attributes().ToList());
+            var attribsAll = node1.GetAttributes().ToList();
+            attribsAll.AddRange(node2.GetAttributes().ToList());
+
+            var attribs = attribsAll.GroupBy(a => a.Name.LocalName)
+                .Select(a => a.First())
+                .Select(a => a.Name.LocalName)
+                .ToList();
+
+            foreach (var attrib in attribs)
+            {
+                // compare Attributes in both documents
+                var attribute1 = node1.Attribute(attrib);
+                var attribute2 = node2.Attribute(attrib);
+
+                if (attribute1 == null && attribute2 != null)
+                {
+                    //added
+                    callback.AttributeAdded(attribute2);
+                    continue;
+                }
+
+
+                if (attribute1 != null && attribute2 == null)
+                {
+                    //removed
+                    callback.AttributeRemoved(attribute1);
+                    continue;
+                }
+
+
+                if (attribute1 != null && attribute2 != null)
+                {
+                    //might have changed
+                    //compare values
+
+                    var val1 = attribute1.Value;
+                    var val2 = attribute2.Value;
+
+                    if (string.Equals(val1, val2))
+                        continue;
+
+                    callback.AttributeChanged(attribute1, attribute2);
+                    continue;
+                }
+
+                throw new Exception("Invalid scenario while comparing Attributes: " + attrib);
+            }
+
         }
 
         public void Dispose()
