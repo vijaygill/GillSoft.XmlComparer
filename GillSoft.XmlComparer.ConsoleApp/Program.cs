@@ -14,8 +14,8 @@ namespace GillSoft.XmlComparer.ConsoleApp
                 var file1 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\App.config";
                 var file2 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\GSSalesManager.exe.config";
 
-                file1 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\TheBrowBarLounge.csproj";
-                file2 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\TheBrowBarLounge.Deploy.csproj";
+                //file1 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\TheBrowBarLounge.csproj";
+                //file2 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\TheBrowBarLounge.Deploy.csproj";
 
                 var p = new Program();
                 using(var comparer = new XmlComparer.Comparer(p))

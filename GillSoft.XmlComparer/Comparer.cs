@@ -32,17 +32,23 @@ namespace GillSoft.XmlComparer
             var elemsAll = doc1.Descendants().Where(a => a != doc1.Root).ToList();
             elemsAll.AddRange(doc2.Descendants().Where(a => a != doc2.Root).ToList());
 
-            var elems = elemsAll.Select(a => new { Element = a, KeyValueInfo = a.GetBestKeyValueInfo() })
-                .Select(a => new { Element = a.Element, KeyValueInfo = a.KeyValueInfo, XPath = a.Element.GetXPath(a.KeyValueInfo == null) }) // if KV is null, use all attributes for filter
+            var elems = elemsAll.Select(a => new { Element = a, KeyValueInfo = a.GetBestKeyValueInfo(), LineNumber = ((IXmlLineInfo)a).LineNumber })
+                .Select(a => new { Element = a.Element, KeyValueInfo = a.KeyValueInfo, XPath = a.Element.GetXPath(a.KeyValueInfo == null), LineNumber = a.LineNumber }) // if KV is null, use all attributes for filter
                 .GroupBy(a => a.XPath)
-                .Select(g => new { XPath = g.Key, Element = g.First().Element, KeyValueInfo = g.First().KeyValueInfo })
+                .Select(g => new { XPath = g.Key, Element = g.First().Element, KeyValueInfo = g.First().KeyValueInfo, LineNumber = g.First().LineNumber })
+                .OrderBy(a => a.LineNumber)
                 .ToList();
+
+            var xPathsToIgnore = new List<string>();
 
 
             foreach (var item in elems)
             {
                 //Console.WriteLine(item.XPath);
                 // compare elements in both documents
+
+                if (xPathsToIgnore.Any(a => a == item.XPath))
+                    continue;
 
                 var node1 = default(XElement);
                 try
@@ -64,6 +70,8 @@ namespace GillSoft.XmlComparer
                 if (node1 == null && node2 != null)
                 {
                     //added
+                    xPathsToIgnore.AddRange(elems.Where(a => a.XPath.StartsWith(item.XPath)).Select(a => a.XPath));
+
                     callback.ElementAdded(node2);
                     continue;
                 }
@@ -72,6 +80,8 @@ namespace GillSoft.XmlComparer
                 if (node1 != null && node2 == null)
                 {
                     //removed
+                    xPathsToIgnore.AddRange(elems.Where(a => a.XPath.StartsWith(item.XPath)).Select(a => a.XPath));
+
                     callback.ElementRemoved(node1);
                     continue;
                 }
@@ -90,6 +100,9 @@ namespace GillSoft.XmlComparer
                         //as those elements will be handled individually
                         continue;
                     }
+
+                    xPathsToIgnore.AddRange(elems.Where(a => a.XPath.StartsWith(item.XPath)).Select(a => a.XPath));
+
                     var val1 = node1.Value;
                     var val2 = node2.Value;
 
@@ -109,16 +122,15 @@ namespace GillSoft.XmlComparer
             var attribsAll = node1.GetAttributes().ToList();
             attribsAll.AddRange(node2.GetAttributes().ToList());
 
-            var attribs = attribsAll.GroupBy(a => a.Name.LocalName)
+            var attribs = attribsAll.GroupBy(a => a.Name.ToString())
                 .Select(a => a.First())
-                .Select(a => a.Name.LocalName)
                 .ToList();
 
             foreach (var attrib in attribs)
             {
                 // compare Attributes in both documents
-                var attribute1 = node1.Attribute(attrib);
-                var attribute2 = node2.Attribute(attrib);
+                var attribute1 = node1.Attribute(attrib.Name);
+                var attribute2 = node2.Attribute(attrib.Name);
 
                 if (attribute1 == null && attribute2 != null)
                 {
