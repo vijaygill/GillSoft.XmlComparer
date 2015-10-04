@@ -35,34 +35,40 @@ namespace GillSoft.XmlComparer.ConsoleApp
 
         public void ElementAdded(System.Xml.Linq.XElement element)
         {
-            Console.WriteLine("++E: {0,-4}: {1}", element.LineNumber(), element);
+            Console.WriteLine("++E: {0,-8}: {1}", element.LineNumber(), element);
+            Console.WriteLine();
         }
 
         public void ElementRemoved(System.Xml.Linq.XElement element)
         {
-            Console.WriteLine("++E: {0,-4}: {1}", element.LineNumber(), element);
+            Console.WriteLine("++E: {0,-8}: {1}", element.LineNumber(), element);
+            Console.WriteLine();
         }
 
         public void ElementChanged(System.Xml.Linq.XElement leftElement, System.Xml.Linq.XElement rightElement)
         {
-            Console.WriteLine("<>E: {0,-4}: {1}", leftElement.LineNumber(), leftElement.Value);
-            Console.WriteLine("  >: {0,-4}: {1}", rightElement.LineNumber(), rightElement.Value);
+            Console.WriteLine("<>E: {0,-8}: {1}", leftElement.LineNumber(), leftElement.Value);
+            Console.WriteLine("  >: {0,-8}: {1}", rightElement.LineNumber(), rightElement.Value);
+            Console.WriteLine();
         }
 
         public void AttributeAdded(System.Xml.Linq.XAttribute attribute)
         {
-            Console.WriteLine("++A: {0,-4}: {1}", attribute.Parent.LineNumber(), attribute.Value);
+            Console.WriteLine("++A: {0,-8}: {1}", attribute.Parent.LineNumber(), attribute.Value);
+            Console.WriteLine();
         }
 
         public void AttributeRemoved(System.Xml.Linq.XAttribute attribute)
         {
-            Console.WriteLine("--A: {0,-4}: {1}", attribute.Parent.LineNumber(), attribute.Value);
+            Console.WriteLine("--A: {0,-8}: {1}", attribute.Parent.LineNumber(), attribute.Value);
+            Console.WriteLine();
         }
 
         public void AttributeChanged(System.Xml.Linq.XAttribute leftAttribute, System.Xml.Linq.XAttribute rightAttribute)
         {
-            Console.WriteLine("<>A: {0,-4}: {1}", leftAttribute.Parent.LineNumber(), leftAttribute.Value);
-            Console.WriteLine("  >: {0,-4}: {1}", rightAttribute.Parent.LineNumber(), rightAttribute.Value);
+            Console.WriteLine("<>A: {0,-8}: {1}", leftAttribute.Parent.LineNumber(), leftAttribute.Value);
+            Console.WriteLine("  >: {0,-8}: {1}", rightAttribute.Parent.LineNumber(), rightAttribute.Value);
+            Console.WriteLine();
         }
     }
 }
