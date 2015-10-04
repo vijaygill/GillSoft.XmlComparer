@@ -83,7 +83,7 @@ namespace GillSoft.XmlComparer
             var res = default(KeyValueElementInfo);
             if (element != null)
             {
-                var attribNames = element.GetAttributes().Select(a => a.Name.LocalName).ToList();
+                var attribNames = element.GetAttributes().Select(a => a.Name.LocalName);
                 res = Common.commonKeyValues
                     .Select(a => new { MatchCount = a.KeyMatchCount(attribNames), KeyValueInfo = a, })
                     .OrderBy(a => a.MatchCount)

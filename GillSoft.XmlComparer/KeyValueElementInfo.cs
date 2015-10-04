@@ -24,7 +24,7 @@ namespace GillSoft.XmlComparer
             this.ValueName = valueName;
         }
 
-        public int KeyMatchCount(List<string> names)
+        public int KeyMatchCount(IEnumerable<string> names)
         {
             var res = names == null ? -1: names.Where(a=> KeyNames.Any(b=> b == a)).Count();
             if (!string.IsNullOrWhiteSpace(ValueName))

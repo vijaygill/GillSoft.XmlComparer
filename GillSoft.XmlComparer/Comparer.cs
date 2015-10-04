@@ -29,15 +29,15 @@ namespace GillSoft.XmlComparer
             var nsm1 = new XmlNamespaceManagerEnhanced(doc1);
             var nsm2 = new XmlNamespaceManagerEnhanced(doc2);
 
-            var elemsAll = doc1.Descendants().Where(a => a != doc1.Root).ToList();
-            elemsAll.AddRange(doc2.Descendants().Where(a => a != doc2.Root).ToList());
-
-            var elems = elemsAll.Select(a => new { LineNumber = a.LineNumber(), Element = a, KeyValueInfo = a.GetBestKeyValueInfo(), })
-                .Select(a => new { LineNumber = a.LineNumber, Element = a.Element, KeyValueInfo = a.KeyValueInfo, XPath = a.Element.GetXPath(a.KeyValueInfo), }) // if KV is null, use all attributes for filter
+            var elems = doc1.Descendants().Where(a => a != doc1.Root)
+                .Union(doc2.Descendants().Where(a => a != doc2.Root))
+                .Select(a => new { LineNumber = a.LineNumber(), Element = a, KeyValueInfo = a.GetBestKeyValueInfo(), })
+                .Select(a => new { LineNumber = a.LineNumber, Element = a.Element, KeyValueInfo = a.KeyValueInfo, XPath = a.Element.GetXPath(a.KeyValueInfo), })
                 .GroupBy(a => a.XPath)
                 .Select(g => new { LineNumber = g.First().LineNumber, XPath = g.Key, Element = g.First().Element, KeyValueInfo = g.First().KeyValueInfo })
                 .OrderBy(a => a.LineNumber)
                 .ToList();
+                ;
 
             var xPathsToIgnore = new List<string>();
 
@@ -119,12 +119,10 @@ namespace GillSoft.XmlComparer
 
         private void CompareAttributes(XElement node1, XElement node2, IXmlCompareHandler callback)
         {
-            var attribsAll = node1.GetAttributes().ToList();
-            attribsAll.AddRange(node2.GetAttributes().ToList());
-
-            var attribs = attribsAll.GroupBy(a => a.Name.ToString())
-                .Select(a => a.First())
-                .ToList();
+            var attribs = node1.GetAttributes()
+                .Union(node2.GetAttributes())
+                .GroupBy(a => a.Name.ToString())
+                .Select(a => a.First());
 
             foreach (var attrib in attribs)
             {
