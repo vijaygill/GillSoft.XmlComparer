@@ -50,17 +50,29 @@ namespace GillSoft.XmlComparer
         }
 
 
-        public static string GetXPath(this XElement element, bool useAllAttributesAsFilter)
+        public static string GetXPath(this XElement element, KeyValueInfo keyValueInfo)
         {
             if (element == null)
                 return string.Empty;
 
-            var res = element.Parent.GetXPath(useAllAttributesAsFilter) + "/" + element.FQN();
+            var kvParent = element.Parent.GetBestKeyValueInfo();
 
-            if (useAllAttributesAsFilter && element.GetAttributes().Any())
+            var res = element.Parent.GetXPath(kvParent) + "/" + element.FQN();
+
+            var attribs = element.GetAttributes();
+
+            if (attribs.Any())
             {
-                var filter = "[" + string.Join(" and ", element.GetAttributes().Select(a => "@" + a.Name.LocalName + "=" + "\"" + a.Value.XmlEncode() + "\"")) + "]";
-                res += filter;
+                if (keyValueInfo == null)
+                {
+                    var filter = "[" + string.Join(" and ", element.GetAttributes().Select(a => "@" + a.Name.LocalName + "=" + "\"" + a.Value.XmlEncode() + "\"")) + "]";
+                    res += filter;
+                }
+                else
+                {
+                    var filter = "[" + string.Join(" and ", element.GetAttributes().Where(a => keyValueInfo.KeyNames.Contains(a.Name.LocalName)).Select(a => "@" + a.Name.LocalName + "=" + "\"" + a.Value.XmlEncode() + "\"")) + "]";
+                    res += filter;
+                }
             }
 
             return res;
@@ -95,6 +107,14 @@ namespace GillSoft.XmlComparer
                 }
                 res = sb.ToString();
             }
+            return res;
+        }
+
+        public static int LineNumber(this XElement element)
+        {
+            if (element == null)
+                return 0;
+            var res = ((IXmlLineInfo)element).LineNumber;
             return res;
         }
 

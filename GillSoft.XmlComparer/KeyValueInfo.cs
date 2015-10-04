@@ -5,7 +5,7 @@ using System.Text;
 
 namespace GillSoft.XmlComparer
 {
-    internal class KeyValueInfo
+    public class KeyValueInfo
     {
         public List<string> KeyNames { get; private set; }
 

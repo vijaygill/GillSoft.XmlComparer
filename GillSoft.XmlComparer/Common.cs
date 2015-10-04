@@ -14,6 +14,7 @@ namespace GillSoft.XmlComparer
             new KeyValueInfo("name", "type"),
             new KeyValueInfo("key", "value"),
             new KeyValueInfo("name"),
+            new KeyValueInfo("key"),
         };
     }
 

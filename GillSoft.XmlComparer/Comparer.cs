@@ -32,10 +32,10 @@ namespace GillSoft.XmlComparer
             var elemsAll = doc1.Descendants().Where(a => a != doc1.Root).ToList();
             elemsAll.AddRange(doc2.Descendants().Where(a => a != doc2.Root).ToList());
 
-            var elems = elemsAll.Select(a => new { Element = a, KeyValueInfo = a.GetBestKeyValueInfo(), LineNumber = ((IXmlLineInfo)a).LineNumber })
-                .Select(a => new { Element = a.Element, KeyValueInfo = a.KeyValueInfo, XPath = a.Element.GetXPath(a.KeyValueInfo == null), LineNumber = a.LineNumber }) // if KV is null, use all attributes for filter
+            var elems = elemsAll.Select(a => new { LineNumber = a.LineNumber(), Element = a, KeyValueInfo = a.GetBestKeyValueInfo(), })
+                .Select(a => new { LineNumber = a.LineNumber, Element = a.Element, KeyValueInfo = a.KeyValueInfo, XPath = a.Element.GetXPath(a.KeyValueInfo), }) // if KV is null, use all attributes for filter
                 .GroupBy(a => a.XPath)
-                .Select(g => new { XPath = g.Key, Element = g.First().Element, KeyValueInfo = g.First().KeyValueInfo, LineNumber = g.First().LineNumber })
+                .Select(g => new { LineNumber = g.First().LineNumber, XPath = g.Key, Element = g.First().Element, KeyValueInfo = g.First().KeyValueInfo })
                 .OrderBy(a => a.LineNumber)
                 .ToList();
 

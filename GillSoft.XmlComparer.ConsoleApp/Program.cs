@@ -14,11 +14,11 @@ namespace GillSoft.XmlComparer.ConsoleApp
                 var file1 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\App.config";
                 var file2 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\GSSalesManager.exe.config";
 
-                //file1 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\TheBrowBarLounge.csproj";
-                //file2 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\TheBrowBarLounge.Deploy.csproj";
+                file1 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\TheBrowBarLounge.csproj";
+                file2 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\TheBrowBarLounge.Deploy.csproj";
 
                 var p = new Program();
-                using(var comparer = new XmlComparer.Comparer(p))
+                using (var comparer = new XmlComparer.Comparer(p))
                 {
                     comparer.Compare(file1, file2, p);
                 }
@@ -35,32 +35,34 @@ namespace GillSoft.XmlComparer.ConsoleApp
 
         public void ElementAdded(System.Xml.Linq.XElement element)
         {
-            Console.WriteLine("++E: " + element);
+            Console.WriteLine("++E: {0,-4}: {1}", element.LineNumber(), element);
         }
 
         public void ElementRemoved(System.Xml.Linq.XElement element)
         {
-            Console.WriteLine("--E: " + element);
+            Console.WriteLine("++E: {0,-4}: {1}", element.LineNumber(), element);
         }
 
         public void ElementChanged(System.Xml.Linq.XElement leftElement, System.Xml.Linq.XElement rightElement)
         {
-            Console.WriteLine("<>E: " + leftElement);
+            Console.WriteLine("<>E: {0,-4}: {1}", leftElement.LineNumber(), leftElement.Value);
+            Console.WriteLine("  >: {0,-4}: {1}", rightElement.LineNumber(), rightElement.Value);
         }
 
         public void AttributeAdded(System.Xml.Linq.XAttribute attribute)
         {
-            Console.WriteLine("++A: " + attribute);
+            Console.WriteLine("++A: {0,-4}: {1}", attribute.Parent.LineNumber(), attribute.Value);
         }
 
         public void AttributeRemoved(System.Xml.Linq.XAttribute attribute)
         {
-            Console.WriteLine("--A: " + attribute);
+            Console.WriteLine("--A: {0,-4}: {1}", attribute.Parent.LineNumber(), attribute.Value);
         }
 
         public void AttributeChanged(System.Xml.Linq.XAttribute leftAttribute, System.Xml.Linq.XAttribute rightAttribute)
         {
-            Console.WriteLine("<>A: " + leftAttribute);
+            Console.WriteLine("<>A: {0,-4}: {1}", leftAttribute.Parent.LineNumber(), leftAttribute.Value);
+            Console.WriteLine("  >: {0,-4}: {1}", rightAttribute.Parent.LineNumber(), rightAttribute.Value);
         }
     }
 }
