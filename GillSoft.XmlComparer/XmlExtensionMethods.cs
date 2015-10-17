@@ -79,7 +79,7 @@ namespace GillSoft.XmlComparer
             {
                 if (keyValueInfo == null)
                 {
-                    var filter = "[" + string.Join(" and ", element.GetAttributes().Select(a => "@" + a.Name.LocalName + "=" + "\"" + a.Value.XmlEncode() + "\"")) + "]";
+                    var filter = "[" + string.Join(" and ", element.GetAttributes().Select(a => a.FQN() + "=" + "\"" + a.Value.XmlEncode() + "\"")) + "]";
                     res += filter;
                 }
                 else
@@ -87,7 +87,7 @@ namespace GillSoft.XmlComparer
                     var filterAttrs = element.GetAttributes().Where(a => keyValueInfo.KeyNames.Any(k => k == a.Name.LocalName)).ToList();
                     if (!filterAttrs.Any())
                         Debugger.Break();
-                    var filter = "[" + string.Join(" and ", filterAttrs.Select(a => "@" + a.Name.LocalName + "=" + "\"" + a.Value.XmlEncode() + "\"")) + "]";
+                    var filter = "[" + string.Join(" and ", filterAttrs.Select(a => "@" + a.FQN() + "=" + "\"" + a.Value.XmlEncode() + "\"")) + "]";
                     res += filter;
                 }
             }

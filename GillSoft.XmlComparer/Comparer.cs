@@ -145,6 +145,13 @@ namespace GillSoft.XmlComparer
                     //xPathsToIgnore.AddRange(elems.Where(a => a.XPath.StartsWith(item.XPath)).Select(a => a.XPath));
                     xPathsToIgnore.Add(item.XPath);
 
+                    if (elems.Any(a=>a.Element.Equals(node2.Parent)))
+                    {
+                        // if the node's parent exists in the list of items,
+                        // there is no need to call the callback
+                        continue;
+                    }
+
                     callback.ElementAdded(item.XPath,node2);
                     continue;
                 }
@@ -155,6 +162,13 @@ namespace GillSoft.XmlComparer
                     //removed
                     //xPathsToIgnore.AddRange(elems.Where(a => a.XPath.StartsWith(item.XPath)).Select(a => a.XPath));
                     xPathsToIgnore.Add(item.XPath);
+
+                    if (elems.Any(a => a.Element.Equals(node1.Parent)))
+                    {
+                        // if the node's parent exists in the list of items,
+                        // there is no need to call the callback
+                        continue;
+                    }
 
                     callback.ElementRemoved(item.XPath, node1);
                     continue;
