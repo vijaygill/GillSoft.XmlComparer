@@ -71,12 +71,12 @@ namespace GillSoft.XmlComparer.UnitTests
 
             //assert
 
-            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<string>(), It.IsAny<XAttribute>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.ElementAdded(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementChanged(It.IsAny<string>(), It.IsAny<XElement>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<AttributeAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<AttributeChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<AttributeRemovedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Never);
 
         }
 
@@ -114,12 +114,12 @@ namespace GillSoft.XmlComparer.UnitTests
 
             //assert
 
-            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<string>(), It.IsAny<XAttribute>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.ElementAdded(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementChanged(It.IsAny<string>(), It.IsAny<XElement>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<AttributeAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<AttributeChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<AttributeRemovedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Never);
 
         }
 
@@ -151,7 +151,7 @@ namespace GillSoft.XmlComparer.UnitTests
             var newValue = string.Empty;
 
             var mockHandler = new Mock<IXmlCompareHandler>(MockBehavior.Strict);
-            mockHandler.Setup(a => a.AttributeAdded(It.IsAny<string>(), It.IsAny<XAttribute>())).Callback<string, XAttribute>((xpath, a) => { newValue = a.Value; });
+            mockHandler.Setup(a => a.AttributeAdded(It.IsAny<AttributeAddedEventArgs>())).Callback<AttributeAddedEventArgs>((e) => { newValue = e.Attribute.Value; });
 
             var comparer = new Comparer(mockHandler.Object);
 
@@ -160,12 +160,12 @@ namespace GillSoft.XmlComparer.UnitTests
 
             //assert
 
-            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Once);
-            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<string>(), It.IsAny<XAttribute>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.ElementAdded(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementChanged(It.IsAny<string>(), It.IsAny<XElement>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<AttributeAddedEventArgs>()), Times.Once);
+            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<AttributeChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<AttributeRemovedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Never);
 
             Assert.AreEqual("new value", newValue);
 
@@ -200,7 +200,8 @@ namespace GillSoft.XmlComparer.UnitTests
             var oldValue = string.Empty;
 
             var mockHandler = new Mock<IXmlCompareHandler>(MockBehavior.Strict);
-            mockHandler.Setup(a => a.AttributeRemoved(It.IsAny<string>(), It.IsAny<XAttribute>())).Callback<string, XAttribute>((xpath, a) => { oldValue = a.Value; });
+            mockHandler.Setup(a => a.AttributeRemoved(It.IsAny<AttributeRemovedEventArgs>()))
+                .Callback<AttributeRemovedEventArgs>((e) => { oldValue = e.Attribute.Value; });
 
             var comparer = new Comparer(mockHandler.Object);
 
@@ -209,12 +210,12 @@ namespace GillSoft.XmlComparer.UnitTests
 
             //assert
 
-            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<string>(), It.IsAny<XAttribute>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Once);
-            mockHandler.Verify(a => a.ElementAdded(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementChanged(It.IsAny<string>(), It.IsAny<XElement>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<AttributeAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<AttributeChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<AttributeRemovedEventArgs>()), Times.Once);
+            mockHandler.Verify(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Never);
 
             Assert.AreEqual("to be deleted", oldValue);
 
@@ -249,8 +250,8 @@ namespace GillSoft.XmlComparer.UnitTests
             var newValue = string.Empty;
 
             var mockHandler = new Mock<IXmlCompareHandler>(MockBehavior.Strict);
-            mockHandler.Setup(a => a.AttributeChanged(It.IsAny<string>(), It.IsAny<XAttribute>(), It.IsAny<XAttribute>()))
-                .Callback<string, XAttribute, XAttribute>((xpath, left, right) => { oldValue = left.Value; newValue = right.Value; });
+            mockHandler.Setup(a => a.AttributeChanged(It.IsAny<AttributeChangedEventArgs>()))
+                .Callback<AttributeChangedEventArgs>((e) => { oldValue = e.LeftAttribute.Value; newValue = e.RightAttribute.Value; });
 
             var comparer = new Comparer(mockHandler.Object);
 
@@ -259,12 +260,12 @@ namespace GillSoft.XmlComparer.UnitTests
 
             //assert
 
-            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<string>(), It.IsAny<XAttribute>(), It.IsAny<XAttribute>()), Times.Once);
-            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.ElementAdded(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementChanged(It.IsAny<string>(), It.IsAny<XElement>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<AttributeAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<AttributeChangedEventArgs>()), Times.Once);
+            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<AttributeRemovedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Never);
 
             Assert.AreEqual("value1", oldValue);
             Assert.AreEqual("value2", newValue);
@@ -299,7 +300,7 @@ namespace GillSoft.XmlComparer.UnitTests
             var newValue = string.Empty;
 
             var mockHandler = new Mock<IXmlCompareHandler>(MockBehavior.Strict);
-            mockHandler.Setup(a => a.ElementAdded(It.IsAny<string>(), It.IsAny<XElement>())).Callback<string, XElement>((xpath, a) => { newValue = a.ToString(); });
+            mockHandler.Setup(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>())).Callback<ElementAddedEventArgs>((e) => { newValue = e.Element.ToString(); });
 
             var comparer = new Comparer(mockHandler.Object);
 
@@ -308,12 +309,12 @@ namespace GillSoft.XmlComparer.UnitTests
 
             //assert
 
-            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<string>(), It.IsAny<XAttribute>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.ElementAdded(It.IsAny<string>(), It.IsAny<XElement>()), Times.Once);
-            mockHandler.Verify(a => a.ElementChanged(It.IsAny<string>(), It.IsAny<XElement>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<AttributeAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<AttributeChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<AttributeRemovedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>()), Times.Once);
+            mockHandler.Verify(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Never);
 
             Assert.AreEqual(@"<add name=""name1"" value=""value1"" newAttribute=""new value"" />", newValue);
 
@@ -346,7 +347,7 @@ namespace GillSoft.XmlComparer.UnitTests
             var oldValue = string.Empty;
 
             var mockHandler = new Mock<IXmlCompareHandler>(MockBehavior.Strict);
-            mockHandler.Setup(a => a.ElementRemoved(It.IsAny<string>(), It.IsAny<XElement>())).Callback<string, XElement>((xpath, a) => { oldValue = a.ToString(); });
+            mockHandler.Setup(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>())).Callback<ElementRemovedEventArgs>((e) => { oldValue = e.Element.ToString(); });
 
             var comparer = new Comparer(mockHandler.Object);
 
@@ -355,12 +356,12 @@ namespace GillSoft.XmlComparer.UnitTests
 
             //assert
 
-            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<string>(), It.IsAny<XAttribute>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.ElementAdded(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementChanged(It.IsAny<string>(), It.IsAny<XElement>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<string>(), It.IsAny<XElement>()), Times.Once);
+            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<AttributeAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<AttributeChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<AttributeRemovedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Once);
 
             Assert.AreEqual(@"<add name=""name1"" value=""value1"" oldAttribute=""to be deleted"" />", oldValue);
 
@@ -393,7 +394,7 @@ namespace GillSoft.XmlComparer.UnitTests
             var newValue = string.Empty;
 
             var mockHandler = new Mock<IXmlCompareHandler>(MockBehavior.Strict);
-            mockHandler.Setup(a => a.ElementAdded(It.IsAny<string>(), It.IsAny<XElement>())).Callback<string, XElement>((xpath, a) => { newValue = a.ToString(); });
+            mockHandler.Setup(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>())).Callback<ElementAddedEventArgs>((e) => { newValue = e.Element.ToString(); });
 
             var comparer = new Comparer(mockHandler.Object);
 
@@ -402,12 +403,12 @@ namespace GillSoft.XmlComparer.UnitTests
 
             //assert
 
-            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<string>(), It.IsAny<XAttribute>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.ElementAdded(It.IsAny<string>(), It.IsAny<XElement>()), Times.Once);
-            mockHandler.Verify(a => a.ElementChanged(It.IsAny<string>(), It.IsAny<XElement>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<AttributeAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<AttributeChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<AttributeRemovedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>()), Times.Once);
+            mockHandler.Verify(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Never);
 
             Assert.AreEqual(@"<elem2>This is element 2</elem2>", newValue);
 
@@ -440,7 +441,7 @@ namespace GillSoft.XmlComparer.UnitTests
             var newValue = string.Empty;
 
             var mockHandler = new Mock<IXmlCompareHandler>(MockBehavior.Strict);
-            mockHandler.Setup(a => a.ElementRemoved(It.IsAny<string>(), It.IsAny<XElement>())).Callback<string, XElement>((xpath, a) => { newValue = a.ToString(); });
+            mockHandler.Setup(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>())).Callback<ElementRemovedEventArgs>((e) => { newValue = e.Element.ToString(); });
 
             var comparer = new Comparer(mockHandler.Object);
 
@@ -449,12 +450,12 @@ namespace GillSoft.XmlComparer.UnitTests
 
             //assert
 
-            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<string>(), It.IsAny<XAttribute>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.ElementAdded(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementChanged(It.IsAny<string>(), It.IsAny<XElement>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<string>(), It.IsAny<XElement>()), Times.Once);
+            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<AttributeAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<AttributeChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<AttributeRemovedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Once);
 
             Assert.AreEqual(@"<elem2>This is element 2</elem2>", newValue);
 
@@ -489,7 +490,8 @@ namespace GillSoft.XmlComparer.UnitTests
             var newValue = string.Empty;
 
             var mockHandler = new Mock<IXmlCompareHandler>(MockBehavior.Strict);
-            mockHandler.Setup(a => a.ElementChanged(It.IsAny<string>(), It.IsAny<XElement>(), It.IsAny<XElement>())).Callback<string, XElement, XElement>((xpath, left, right) => { oldValue = left.ToString(); newValue = right.ToString(); });
+            mockHandler.Setup(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()))
+                .Callback<ElementChangedEventArgs>((e) => { oldValue = e.LeftElement.ToString(); newValue = e.RightElement.ToString(); });
 
             var comparer = new Comparer(mockHandler.Object);
 
@@ -498,12 +500,12 @@ namespace GillSoft.XmlComparer.UnitTests
 
             //assert
 
-            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<string>(), It.IsAny<XAttribute>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.ElementAdded(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementChanged(It.IsAny<string>(), It.IsAny<XElement>(), It.IsAny<XElement>()), Times.Once);
-            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<AttributeAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<AttributeChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<AttributeRemovedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()), Times.Once);
+            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Never);
 
             Assert.AreEqual(@"<elem1 name=""MyLogger"">This is element 1 but changed now</elem1>", newValue);
 
@@ -538,7 +540,8 @@ namespace GillSoft.XmlComparer.UnitTests
             var newValue = string.Empty;
 
             var mockHandler = new Mock<IXmlCompareHandler>(MockBehavior.Strict);
-            mockHandler.Setup(a => a.ElementChanged(It.IsAny<string>(), It.IsAny<XElement>(), It.IsAny<XElement>())).Callback<string, XElement, XElement>((xpath, left, right) => { oldValue = left.ToString(); newValue = right.ToString(); });
+            mockHandler.Setup(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()))
+                .Callback<ElementChangedEventArgs>((e) => { oldValue = e.LeftElement.ToString(); newValue = e.RightElement.ToString(); });
 
             var comparer = new Comparer(mockHandler.Object);
 
@@ -547,12 +550,12 @@ namespace GillSoft.XmlComparer.UnitTests
 
             //assert
 
-            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<string>(), It.IsAny<XAttribute>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<string>(), It.IsAny<XAttribute>()), Times.Never);
-            mockHandler.Verify(a => a.ElementAdded(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
-            mockHandler.Verify(a => a.ElementChanged(It.IsAny<string>(), It.IsAny<XElement>(), It.IsAny<XElement>()), Times.Once);
-            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<string>(), It.IsAny<XElement>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<AttributeAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<AttributeChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<AttributeRemovedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()), Times.Once);
+            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Never);
 
             Assert.AreEqual(@"<child>This is element 1 but changed now</child>", newValue);
 

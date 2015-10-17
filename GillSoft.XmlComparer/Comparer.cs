@@ -155,7 +155,7 @@ namespace GillSoft.XmlComparer
 
                     xPathsAdded.Add(item.XPath);
 
-                    callback.ElementAdded(item.XPath, node2);
+                    callback.ElementAdded(new ElementAddedEventArgs(item.XPath, node2, node2.LineNumber()));
                     continue;
                 }
 
@@ -172,7 +172,7 @@ namespace GillSoft.XmlComparer
 
                     xPathsRemoved.Add(item.XPath);
 
-                    callback.ElementRemoved(item.XPath, node1);
+                    callback.ElementRemoved(new ElementRemovedEventArgs(item.XPath, node1, node1.LineNumber()));
                     continue;
                 }
 
@@ -197,7 +197,7 @@ namespace GillSoft.XmlComparer
                     if (string.Equals(val1, val2))
                         continue;
 
-                    callback.ElementChanged(item.XPath, node1, node2);
+                    callback.ElementChanged(new ElementChangedEventArgs(item.XPath, node1, node1.LineNumber(), node2, node2.LineNumber()));
                     continue;
                 }
 
@@ -255,7 +255,7 @@ namespace GillSoft.XmlComparer
                 if (attribute1 == null && attribute2 != null)
                 {
                     //added
-                    callback.AttributeAdded(attribute2.GetXPath(), attribute2);
+                    callback.AttributeAdded(new AttributeAddedEventArgs(attribute2.GetXPath(), attribute2, attribute2.Parent.LineNumber()));
                     continue;
                 }
 
@@ -263,7 +263,7 @@ namespace GillSoft.XmlComparer
                 if (attribute1 != null && attribute2 == null)
                 {
                     //removed
-                    callback.AttributeRemoved(attribute1.GetXPath(), attribute1);
+                    callback.AttributeRemoved(new AttributeRemovedEventArgs(attribute1.GetXPath(), attribute1, attribute1.Parent.LineNumber()));
                     continue;
                 }
 
@@ -279,7 +279,7 @@ namespace GillSoft.XmlComparer
                     if (string.Equals(val1, val2))
                         continue;
 
-                    callback.AttributeChanged(attribute1.GetXPath(), attribute1, attribute2);
+                    callback.AttributeChanged(new AttributeChangedEventArgs(attribute1.GetXPath(), attribute1, attribute1.Parent.LineNumber(), attribute2, attribute2.Parent.LineNumber()));
                     continue;
                 }
 

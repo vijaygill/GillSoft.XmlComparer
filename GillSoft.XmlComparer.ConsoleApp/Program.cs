@@ -39,47 +39,47 @@ namespace GillSoft.XmlComparer.ConsoleApp
 
 
 
-        public void ElementAdded(string xPath, System.Xml.Linq.XElement element)
+        public void ElementAdded(ElementAddedEventArgs e)
         {
-            Console.WriteLine("++E: {0,-8}: {1}", element.LineNumber(), xPath);
-            Console.WriteLine("   : {0}", element);
+            Console.WriteLine("++E: {0,-8}: {1}", e.LineNumber, e.XPath);
+            Console.WriteLine("   : {0}", e.Element);
             Console.WriteLine();
         }
 
-        public void ElementRemoved(string xPath, System.Xml.Linq.XElement element)
+        public void ElementRemoved(ElementRemovedEventArgs e)
         {
-            Console.WriteLine("--E: {0,-8}: {1}", element.LineNumber(), xPath);
-            Console.WriteLine("   : {0}", element);
+            Console.WriteLine("--E: {0,-8}: {1}", e.LineNumber, e.XPath);
+            Console.WriteLine("   : {0}", e.Element);
             Console.WriteLine();
         }
 
-        public void ElementChanged(string xPath, System.Xml.Linq.XElement leftElement, System.Xml.Linq.XElement rightElement)
+        public void ElementChanged(ElementChangedEventArgs e)
         {
-            Console.WriteLine("<>E: {0}", xPath);
-            Console.WriteLine("  o: {0,-8}: {1}", leftElement.LineNumber(), leftElement.Value);
-            Console.WriteLine("  n: {0,-8}: {1}", rightElement.LineNumber(), rightElement.Value);
+            Console.WriteLine("<>E: {0}", e.XPath);
+            Console.WriteLine("  o: {0,-8}: {1}", e.LeftLineNumber, e.LeftElement);
+            Console.WriteLine("  n: {0,-8}: {1}", e.RightLineNumber, e.RightElement.Value);
             Console.WriteLine();
         }
 
-        public void AttributeAdded(string xPath, System.Xml.Linq.XAttribute attribute)
+        public void AttributeAdded(AttributeAddedEventArgs e)
         {
-            Console.WriteLine("++A: {0,-8}: {1}", attribute.Parent.LineNumber(), xPath);
-            Console.WriteLine("   : {0}", attribute.Value);
+            Console.WriteLine("++A: {0,-8}: {1}", e.LineNumber, e.XPath);
+            Console.WriteLine("   : {0}", e.Attribute.Value);
             Console.WriteLine();
         }
 
-        public void AttributeRemoved(string xPath, System.Xml.Linq.XAttribute attribute)
+        public void AttributeRemoved(AttributeRemovedEventArgs e)
         {
-            Console.WriteLine("--A: {0,-8}: {1}", attribute.Parent.LineNumber(), xPath);
-            Console.WriteLine("   : {0}", attribute.Value);
+            Console.WriteLine("--A: {0,-8}: {1}", e.LineNumber, e.XPath);
+            Console.WriteLine("   : {0}", e.Attribute.Value);
             Console.WriteLine();
         }
 
-        public void AttributeChanged(string xPath, System.Xml.Linq.XAttribute leftAttribute, System.Xml.Linq.XAttribute rightAttribute)
+        public void AttributeChanged(AttributeChangedEventArgs e)
         {
-            Console.WriteLine("<>A: {0}", xPath);
-            Console.WriteLine("  o: {0,-8}: {1}", leftAttribute.Parent.LineNumber(), leftAttribute.Value);
-            Console.WriteLine("  n: {0,-8}: {1}", rightAttribute.Parent.LineNumber(), rightAttribute.Value);
+            Console.WriteLine("<>A: {0}", e.XPath);
+            Console.WriteLine("  o: {0,-8}: {1}", e.LeftLineNumber, e.LeftAttribute.Value);
+            Console.WriteLine("  n: {0,-8}: {1}", e.RightLineNumber, e.RightAttribute.Value);
 
             Console.WriteLine();
         }

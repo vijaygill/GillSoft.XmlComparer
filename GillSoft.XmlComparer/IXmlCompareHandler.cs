@@ -8,16 +8,16 @@ namespace GillSoft.XmlComparer
 {
     public interface IXmlCompareHandler
     {
-        void ElementAdded(string xPath, XElement element);
+        void ElementAdded(ElementAddedEventArgs e);
 
-        void ElementRemoved(string xPath, XElement element);
+        void ElementRemoved(ElementRemovedEventArgs e);
 
-        void ElementChanged(string xPath, XElement leftElement, XElement rightElement);
+        void ElementChanged(ElementChangedEventArgs e);
 
-        void AttributeAdded(string xPath, XAttribute attribute);
+        void AttributeAdded(AttributeAddedEventArgs e);
 
-        void AttributeRemoved(string xPath, XAttribute attribute);
+        void AttributeRemoved(AttributeRemovedEventArgs e);
 
-        void AttributeChanged(string xPath, XAttribute leftAttribute, XAttribute rightAttribute);
+        void AttributeChanged(AttributeChangedEventArgs e);
     }
 }

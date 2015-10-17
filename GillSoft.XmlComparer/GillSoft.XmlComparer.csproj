@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Common.cs" />
     <Compile Include="Comparer.cs" />
+    <Compile Include="EventArgs.cs" />
     <Compile Include="IXmlCompareHandler.cs" />
     <Compile Include="KeyValueElementInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
