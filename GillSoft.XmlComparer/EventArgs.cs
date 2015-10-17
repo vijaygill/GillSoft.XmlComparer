@@ -12,7 +12,7 @@ namespace GillSoft.XmlComparer
 
         public CompareEventArgs(string xPath)
         {
-            this.XPath = XPath;
+            this.XPath = xPath;
         }
     }
 

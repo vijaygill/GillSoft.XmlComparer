@@ -91,6 +91,10 @@ namespace GillSoft.XmlComparer
             var xPathsRemoved = new List<string>();
             var xPathsChanged = new List<string>();
 
+            var additions = new List<ElementAddedEventArgs>();
+            var changes = new List<ElementChangedEventArgs>();
+            var removals = new List<ElementRemovedEventArgs>();
+
             foreach (var item in itemsToProcess)
             {
                 if (xPathsAdded.Any(a => a == item.XPath)
@@ -155,7 +159,7 @@ namespace GillSoft.XmlComparer
 
                     xPathsAdded.Add(item.XPath);
 
-                    callback.ElementAdded(new ElementAddedEventArgs(item.XPath, node2, node2.LineNumber()));
+                    additions.Add(new ElementAddedEventArgs(item.XPath, node2, node2.LineNumber()));
                     continue;
                 }
 
@@ -172,7 +176,7 @@ namespace GillSoft.XmlComparer
 
                     xPathsRemoved.Add(item.XPath);
 
-                    callback.ElementRemoved(new ElementRemovedEventArgs(item.XPath, node1, node1.LineNumber()));
+                    removals.Add(new ElementRemovedEventArgs(item.XPath, node1, node1.LineNumber()));
                     continue;
                 }
 
@@ -197,11 +201,24 @@ namespace GillSoft.XmlComparer
                     if (string.Equals(val1, val2))
                         continue;
 
-                    callback.ElementChanged(new ElementChangedEventArgs(item.XPath, node1, node1.LineNumber(), node2, node2.LineNumber()));
+                    changes.Add(new ElementChangedEventArgs(item.XPath, node1, node1.LineNumber(), node2, node2.LineNumber()));
                     continue;
                 }
 
                 throw new Exception("Invalid scenario while comparing elements: " + item.XPath);
+            }
+
+            foreach (var item in removals)
+            {
+                callback.ElementRemoved(item);
+            }
+            foreach (var item in additions)
+            {
+                callback.ElementAdded(item);
+            }
+            foreach (var item in changes)
+            {
+                callback.ElementChanged(item);
             }
         }
 

@@ -56,7 +56,7 @@ namespace GillSoft.XmlComparer.ConsoleApp
         public void ElementChanged(ElementChangedEventArgs e)
         {
             Console.WriteLine("<>E: {0}", e.XPath);
-            Console.WriteLine("  o: {0,-8}: {1}", e.LeftLineNumber, e.LeftElement);
+            Console.WriteLine("  o: {0,-8}: {1}", e.LeftLineNumber, e.LeftElement.Value);
             Console.WriteLine("  n: {0,-8}: {1}", e.RightLineNumber, e.RightElement.Value);
             Console.WriteLine();
         }
