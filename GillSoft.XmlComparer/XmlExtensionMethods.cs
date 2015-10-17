@@ -94,9 +94,10 @@ namespace GillSoft.XmlComparer
             {
                 var attribNames = element.GetAttributes().Select(a => a.Name.LocalName);
                 res = Common.commonKeyValues
-                    .Select(a => new { MatchCount = KeyValueElementInfo.KeyMatchCount(a, attribNames), KeyValueInfo = a, })
+                    .Where(a => attribNames.Count() > 1 || string.IsNullOrWhiteSpace(a.ValueName))
+                    .Select(a => new { MatchCount = KeyValueElementInfo.KeyMatchCount(a, element.Name.LocalName, attribNames), KeyValueInfo = a, })
                     .OrderByDescending(a => a.MatchCount)
-                    .Where(a => a.MatchCount >= 2)
+                    .Where(a => a.MatchCount >= (attribNames.Count() == 1 ? 1 : 2))
                     .Select(a => a.KeyValueInfo)
                     .FirstOrDefault()
                     ;

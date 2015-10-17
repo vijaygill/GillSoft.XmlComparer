@@ -83,7 +83,7 @@ namespace GillSoft.XmlComparer
                 .ToList();
 
             var elems = doc1DescendantsDiff
-                .Union(doc2DescendantsDiff)
+                .Concat(doc2DescendantsDiff)
                 .OrderBy(a => a.LineNumber).ThenBy(a => a.Source)
                 .ToList();
 

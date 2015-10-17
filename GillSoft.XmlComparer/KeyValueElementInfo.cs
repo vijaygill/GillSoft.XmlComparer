@@ -8,17 +8,20 @@ namespace GillSoft.XmlComparer
 {
     public class KeyValueElementInfo
     {
+        public string ElementName { get; private set; }
+
         public List<string> KeyNames { get; private set; }
 
         public string ValueName { get; private set; }
 
-        public KeyValueElementInfo(string keyName, string valueName = null)
-            : this(new[] { keyName }, valueName)
+        public KeyValueElementInfo(string elementName, string keyName, string valueName = null)
+            : this(elementName, new[] { keyName }, valueName)
         {
         }
 
-        public KeyValueElementInfo(string[] keyNames, string valueName = null)
+        public KeyValueElementInfo(string elementName, string[] keyNames, string valueName = null)
         {
+            this.ElementName = elementName;
             this.KeyNames = new List<string>();
             this.KeyNames.AddRange(keyNames);
 
@@ -26,13 +29,17 @@ namespace GillSoft.XmlComparer
         }
 
 
-        public static int KeyMatchCount(KeyValueElementInfo kv, IEnumerable<string> names)
+        public static int KeyMatchCount(KeyValueElementInfo kv, string elementName, IEnumerable<string> names)
         {
-            var res = names == null ? -1 : names.Where(a => kv.KeyNames.Any(b => b == a)).Count();
-            if (!string.IsNullOrWhiteSpace(kv.ValueName))
+            var res = 0;
+            if (kv.ElementName == "*" || kv.ElementName == elementName)
             {
-                if (names.Any(a => a == kv.ValueName))
-                    res++;
+                res = names == null || names.Count() == 0 ? -1 : names.Where(a => kv.KeyNames.Any(b => b == a)).Count();
+                if (!string.IsNullOrWhiteSpace(kv.ValueName))
+                {
+                    if (names != null && names.Any(a => a == kv.ValueName))
+                        res++;
+                }
             }
             return res;
         }
