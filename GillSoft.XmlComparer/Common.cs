@@ -10,6 +10,7 @@ namespace GillSoft.XmlComparer
         public static readonly string DefaultNamespace = "ns000";
 
         internal static readonly List<KeyValueElementInfo> commonKeyValues = new List<KeyValueElementInfo> { 
+            new KeyValueElementInfo("add", "value"),
             new KeyValueElementInfo("name", "value"),
             new KeyValueElementInfo("name", "type"),
             new KeyValueElementInfo("key", "value"),

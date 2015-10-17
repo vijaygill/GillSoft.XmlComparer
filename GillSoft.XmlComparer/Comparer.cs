@@ -19,58 +19,131 @@ namespace GillSoft.XmlComparer
             this.xmlCompareHandler = xmlCompareHandler;
         }
 
-        public void Compare(string file1, string file2, IXmlCompareHandler callback)
+        private class Elem
+        {
+            public int LineNumber { get; private set; }
+
+            public XElement Element { get; private set; }
+
+            public KeyValueElementInfo KeyValueInfo { get; private set; }
+
+            public int Source { get; private set; }
+
+            public string XPath { get; private set; }
+
+            public static Elem Create(XElement element, int source)
+            {
+                var kv = element.GetBestKeyValueInfo();
+                var res = new Elem
+                {
+                    LineNumber = element.LineNumber(),
+                    Element = element,
+                    KeyValueInfo = kv,
+                    Source = source,
+                    XPath = element.GetXPath(kv),
+                };
+                return res;
+            }
+
+            public override string ToString()
+            {
+                var res = string.Format("{0,-5}: {1} - {2}", LineNumber, Source, Element.Name.LocalName, XPath);
+                return res;
+            }
+        }
+
+        public void Compare(Stream stream1, Stream stream2, IXmlCompareHandler callback)
         {
             var loadOptions = LoadOptions.SetBaseUri | LoadOptions.SetLineInfo;
+            const int leftId = 1;
+            const int rightId = 2;
 
-            var doc1 = XDocument.Load(file1, loadOptions);
-            var doc2 = XDocument.Load(file2, loadOptions);
+            var doc1 = XDocument.Load(stream1, loadOptions);
+            var doc2 = XDocument.Load(stream2, loadOptions);
 
             var nsm1 = new XmlNamespaceManagerEnhanced(doc1);
             var nsm2 = new XmlNamespaceManagerEnhanced(doc2);
 
-            var elems = doc1.Descendants().Where(a => a != doc1.Root)
-                .Union(doc2.Descendants().Where(a => a != doc2.Root))
-                .Select(a => new { LineNumber = a.LineNumber(), Element = a, KeyValueInfo = a.GetBestKeyValueInfo(), })
-                .Select(a => new { LineNumber = a.LineNumber, Element = a.Element, KeyValueInfo = a.KeyValueInfo, XPath = a.Element.GetXPath(a.KeyValueInfo), })
-                .GroupBy(a => a.XPath)
-                .Select(g => new { LineNumber = g.First().LineNumber, XPath = g.Key, Element = g.First().Element, KeyValueInfo = g.First().KeyValueInfo })
-                .OrderBy(a => a.LineNumber)
+            var doc1Descendants = doc1.Descendants()
+                .Where(a => a != doc1.Root)
+                .Select(a => new { Source = leftId, Element = a });
+
+            var doc2Descendants = doc2.Descendants()
+                .Where(a => a != doc2.Root)
+                .Select(a => new { Source = rightId, Element = a });
+
+            var doc1DescendantsDiff = doc1Descendants
+                .Where(a => !doc2Descendants.Any(a2 => XNode.DeepEquals(a2.Element, a.Element)))
+                .Select(a => Elem.Create(a.Element, a.Source))
                 .ToList();
-                ;
+
+            var doc2DescendantsDiff = doc2Descendants
+                .Where(a => !doc1Descendants.Any(a1 => XNode.DeepEquals(a1.Element, a.Element)))
+                .Select(a => Elem.Create(a.Element, a.Source))
+                .ToList();
+
+            var elems = doc1DescendantsDiff
+                .Union(doc2DescendantsDiff)
+                .OrderBy(a => a.LineNumber).ThenBy(a => a.Source)
+                .ToList();
 
             var xPathsToIgnore = new List<string>();
-
 
             foreach (var item in elems)
             {
                 //Console.WriteLine(item.XPath);
-                // compare elements in both documents
 
                 if (xPathsToIgnore.Any(a => a == item.XPath))
                     continue;
 
-                var node1 = default(XElement);
-                try
+                var node1 = item.Source != leftId ? default(XElement) : item.Element;
+                var node2 = item.Source != rightId ? default(XElement) : item.Element;
+
+                // now get item from other side
+                switch (item.Source)
                 {
-                    node1 = doc1.XPathSelectElements(item.XPath, nsm1).FirstOrDefault();
+                    case leftId:
+                        {
+                            // get node2
+                            var e = elems.FirstOrDefault(a => a.Source == rightId && a.XPath == item.XPath);
+                            if (e != null)
+                            {
+                                node2 = e.Element;
+                            }
+                            break;
+                        }
+                    case rightId:
+                        {
+                            // get node1
+                            var e = elems.FirstOrDefault(a => a.Source == leftId && a.XPath == item.XPath);
+                            if (e != null)
+                            {
+                                node1 = e.Element;
+                            }
+                            break;
+                        }
+                    default:
+                        {
+                            throw new Exception("Invalid Source " + item + " for item : " + item.XPath);
+                        }
                 }
-                catch
+
+
+                if (node1 != null && node2 != null)
                 {
-                }
-                var node2 = default(XElement);
-                try
-                {
-                    node2 = doc2.XPathSelectElements(item.XPath, nsm2).FirstOrDefault();
-                }
-                catch
-                {
+                    xPathsToIgnore.Add(item.XPath);
+                    CompareAttributes(node1, node2, callback);
+
+                    // if there are sub-elements, those will be handled separately
+                    if (node1.HasElements || node2.HasElements)
+                        continue;
                 }
 
                 if (node1 == null && node2 != null)
                 {
                     //added
-                    xPathsToIgnore.AddRange(elems.Where(a => a.XPath.StartsWith(item.XPath)).Select(a => a.XPath));
+                    //xPathsToIgnore.AddRange(elems.Where(a => a.XPath.StartsWith(item.XPath)).Select(a => a.XPath));
+                    xPathsToIgnore.Add(item.XPath);
 
                     callback.ElementAdded(node2);
                     continue;
@@ -80,7 +153,8 @@ namespace GillSoft.XmlComparer
                 if (node1 != null && node2 == null)
                 {
                     //removed
-                    xPathsToIgnore.AddRange(elems.Where(a => a.XPath.StartsWith(item.XPath)).Select(a => a.XPath));
+                    //xPathsToIgnore.AddRange(elems.Where(a => a.XPath.StartsWith(item.XPath)).Select(a => a.XPath));
+                    xPathsToIgnore.Add(item.XPath);
 
                     callback.ElementRemoved(node1);
                     continue;
@@ -92,16 +166,8 @@ namespace GillSoft.XmlComparer
                     //might have changed
                     //compare values
 
-                    CompareAttributes(node1, node2, callback);
-
-                    if (node1.HasElements || node2.HasElements)
-                    {
-                        //if there are child elements, ignore these nodes
-                        //as those elements will be handled individually
-                        continue;
-                    }
-
-                    xPathsToIgnore.AddRange(elems.Where(a => a.XPath.StartsWith(item.XPath)).Select(a => a.XPath));
+                    //xPathsToIgnore.AddRange(elems.Where(a => a.XPath.StartsWith(item.XPath)).Select(a => a.XPath));
+                    xPathsToIgnore.Add(item.XPath);
 
                     var val1 = node1.Value;
                     var val2 = node2.Value;
@@ -114,6 +180,17 @@ namespace GillSoft.XmlComparer
                 }
 
                 throw new Exception("Invalid scenario while comparing elements: " + item.XPath);
+            }
+        }
+
+        public void Compare(string file1, string file2, IXmlCompareHandler callback)
+        {
+            using (var stream1 = File.OpenRead(file1))
+            {
+                using (var stream2 = File.OpenRead(file2))
+                {
+                    this.Compare(stream1, stream2, callback);
+                }
             }
         }
 

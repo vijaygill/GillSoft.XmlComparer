@@ -17,6 +17,9 @@ namespace GillSoft.XmlComparer.ConsoleApp
                 file1 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\TheBrowBarLounge.csproj";
                 file2 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\TheBrowBarLounge.Deploy.csproj";
 
+                //file1 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\a1.config";
+                //file2 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\a2.config";
+
                 var p = new Program();
                 using (var comparer = new XmlComparer.Comparer(p))
                 {
@@ -41,7 +44,7 @@ namespace GillSoft.XmlComparer.ConsoleApp
 
         public void ElementRemoved(System.Xml.Linq.XElement element)
         {
-            Console.WriteLine("++E: {0,-8}: {1}", element.LineNumber(), element);
+            Console.WriteLine("--E: {0,-8}: {1}", element.LineNumber(), element);
             Console.WriteLine();
         }
 

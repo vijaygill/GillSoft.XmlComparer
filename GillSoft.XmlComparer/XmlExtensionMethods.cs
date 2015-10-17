@@ -55,6 +55,12 @@ namespace GillSoft.XmlComparer
             if (element == null)
                 return string.Empty;
 
+            if (element == element.Document.Root)
+            {
+                var s = "/" + element.FQN();
+                return s;
+            }
+
             var kvParent = element.Parent.GetBestKeyValueInfo();
 
             var res = element.Parent.GetXPath(kvParent) + "/" + element.FQN();
@@ -70,7 +76,10 @@ namespace GillSoft.XmlComparer
                 }
                 else
                 {
-                    var filter = "[" + string.Join(" and ", element.GetAttributes().Where(a => keyValueInfo.KeyNames.Contains(a.Name.LocalName)).Select(a => "@" + a.Name.LocalName + "=" + "\"" + a.Value.XmlEncode() + "\"")) + "]";
+                    var filterAttrs = element.GetAttributes().Where(a => keyValueInfo.KeyNames.Any(k => k == a.Name.LocalName)).ToList();
+                    if (!filterAttrs.Any())
+                        Debugger.Break();
+                    var filter = "[" + string.Join(" and ", filterAttrs.Select(a => "@" + a.Name.LocalName + "=" + "\"" + a.Value.XmlEncode() + "\"")) + "]";
                     res += filter;
                 }
             }
@@ -85,9 +94,9 @@ namespace GillSoft.XmlComparer
             {
                 var attribNames = element.GetAttributes().Select(a => a.Name.LocalName);
                 res = Common.commonKeyValues
-                    .Select(a => new { MatchCount = a.KeyMatchCount(attribNames), KeyValueInfo = a, })
-                    .OrderBy(a => a.MatchCount)
-                    .Where(a => a.MatchCount >= 1)
+                    .Select(a => new { MatchCount = KeyValueElementInfo.KeyMatchCount(a, attribNames), KeyValueInfo = a, })
+                    .OrderByDescending(a => a.MatchCount)
+                    .Where(a => a.MatchCount >= 2)
                     .Select(a => a.KeyValueInfo)
                     .FirstOrDefault()
                     ;

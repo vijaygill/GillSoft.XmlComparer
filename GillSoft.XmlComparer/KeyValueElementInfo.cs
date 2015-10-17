@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -24,12 +25,13 @@ namespace GillSoft.XmlComparer
             this.ValueName = valueName;
         }
 
-        public int KeyMatchCount(IEnumerable<string> names)
+
+        public static int KeyMatchCount(KeyValueElementInfo kv, IEnumerable<string> names)
         {
-            var res = names == null ? -1: names.Where(a=> KeyNames.Any(b=> b == a)).Count();
-            if (!string.IsNullOrWhiteSpace(ValueName))
+            var res = names == null ? -1 : names.Where(a => kv.KeyNames.Any(b => b == a)).Count();
+            if (!string.IsNullOrWhiteSpace(kv.ValueName))
             {
-                if (names.Any(a => a == ValueName))
+                if (names.Any(a => a == kv.ValueName))
                     res++;
             }
             return res;
@@ -40,5 +42,6 @@ namespace GillSoft.XmlComparer
             var res = string.Join(", ", KeyNames) + ": " + ValueName;
             return res;
         }
+
     }
 }

@@ -7,6 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GillSoft.XmlComparer", "Gil
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GillSoft.XmlComparer.ConsoleApp", "GillSoft.XmlComparer.ConsoleApp\GillSoft.XmlComparer.ConsoleApp.csproj", "{405053C5-3CD0-473A-A428-529878FE0763}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GillSoft.XmlComparer.UnitTests", "GillSoft.XmlComparer.UnitTests\GillSoft.XmlComparer.UnitTests.csproj", "{5C9E9AEB-796F-45A2-9480-939C4B8BD571}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{70D8E610-AA33-4425-98EA-D5F7BF9553DE}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +28,10 @@ Global
 		{405053C5-3CD0-473A-A428-529878FE0763}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{405053C5-3CD0-473A-A428-529878FE0763}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{405053C5-3CD0-473A-A428-529878FE0763}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C9E9AEB-796F-45A2-9480-939C4B8BD571}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C9E9AEB-796F-45A2-9480-939C4B8BD571}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C9E9AEB-796F-45A2-9480-939C4B8BD571}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C9E9AEB-796F-45A2-9480-939C4B8BD571}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
