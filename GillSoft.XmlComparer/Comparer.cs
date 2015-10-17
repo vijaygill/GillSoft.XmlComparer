@@ -82,19 +82,24 @@ namespace GillSoft.XmlComparer
                 .Select(a => Elem.Create(a.Element, a.Source))
                 .ToList();
 
-            var elems = doc1DescendantsDiff
+            var itemsToProcess = doc1DescendantsDiff
                 .Concat(doc2DescendantsDiff)
                 .OrderBy(a => a.LineNumber).ThenBy(a => a.Source)
                 .ToList();
 
-            var xPathsToIgnore = new List<string>();
+            var xPathsAdded = new List<string>();
+            var xPathsRemoved = new List<string>();
+            var xPathsChanged = new List<string>();
 
-            foreach (var item in elems)
+            foreach (var item in itemsToProcess)
             {
-                //Console.WriteLine(item.XPath);
-
-                if (xPathsToIgnore.Any(a => a == item.XPath))
+                if (xPathsAdded.Any(a => a == item.XPath)
+                    || xPathsChanged.Any(a => a == item.XPath)
+                    || xPathsRemoved.Any(a => a == item.XPath)
+                )
                     continue;
+
+                //Console.WriteLine(item.XPath);
 
                 var node1 = item.Source != leftId ? default(XElement) : item.Element;
                 var node2 = item.Source != rightId ? default(XElement) : item.Element;
@@ -105,7 +110,7 @@ namespace GillSoft.XmlComparer
                     case leftId:
                         {
                             // get node2
-                            var e = elems.FirstOrDefault(a => a.Source == rightId && a.XPath == item.XPath);
+                            var e = itemsToProcess.FirstOrDefault(a => a.Source == rightId && a.XPath == item.XPath);
                             if (e != null)
                             {
                                 node2 = e.Element;
@@ -115,7 +120,7 @@ namespace GillSoft.XmlComparer
                     case rightId:
                         {
                             // get node1
-                            var e = elems.FirstOrDefault(a => a.Source == leftId && a.XPath == item.XPath);
+                            var e = itemsToProcess.FirstOrDefault(a => a.Source == leftId && a.XPath == item.XPath);
                             if (e != null)
                             {
                                 node1 = e.Element;
@@ -131,7 +136,6 @@ namespace GillSoft.XmlComparer
 
                 if (node1 != null && node2 != null)
                 {
-                    xPathsToIgnore.Add(item.XPath);
                     CompareAttributes(node1, node2, callback);
 
                     // if there are sub-elements, those will be handled separately
@@ -142,17 +146,16 @@ namespace GillSoft.XmlComparer
                 if (node1 == null && node2 != null)
                 {
                     //added
-                    //xPathsToIgnore.AddRange(elems.Where(a => a.XPath.StartsWith(item.XPath)).Select(a => a.XPath));
-                    xPathsToIgnore.Add(item.XPath);
-
-                    if (elems.Any(a=>a.Element.Equals(node2.Parent)))
+                    if (xPathsAdded.Any(a => item.XPath.StartsWith(a)))
                     {
                         // if the node's parent exists in the list of items,
                         // there is no need to call the callback
                         continue;
                     }
 
-                    callback.ElementAdded(item.XPath,node2);
+                    xPathsAdded.Add(item.XPath);
+
+                    callback.ElementAdded(item.XPath, node2);
                     continue;
                 }
 
@@ -160,15 +163,14 @@ namespace GillSoft.XmlComparer
                 if (node1 != null && node2 == null)
                 {
                     //removed
-                    //xPathsToIgnore.AddRange(elems.Where(a => a.XPath.StartsWith(item.XPath)).Select(a => a.XPath));
-                    xPathsToIgnore.Add(item.XPath);
-
-                    if (elems.Any(a => a.Element.Equals(node1.Parent)))
+                    if (xPathsRemoved.Any(a => item.XPath.StartsWith(a)))
                     {
                         // if the node's parent exists in the list of items,
                         // there is no need to call the callback
                         continue;
                     }
+
+                    xPathsRemoved.Add(item.XPath);
 
                     callback.ElementRemoved(item.XPath, node1);
                     continue;
@@ -180,8 +182,14 @@ namespace GillSoft.XmlComparer
                     //might have changed
                     //compare values
 
-                    //xPathsToIgnore.AddRange(elems.Where(a => a.XPath.StartsWith(item.XPath)).Select(a => a.XPath));
-                    xPathsToIgnore.Add(item.XPath);
+                    if (xPathsChanged.Any(a => item.XPath.StartsWith(a)))
+                    {
+                        // if the node's parent exists in the list of items,
+                        // there is no need to call the callback
+                        continue;
+                    }
+
+                    xPathsChanged.Add(item.XPath);
 
                     var val1 = node1.Value;
                     var val2 = node2.Value;
@@ -201,7 +209,7 @@ namespace GillSoft.XmlComparer
         {
             if (xElement1 == null && xElement2 == null)
                 return true;
-            
+
             if (xElement1 == null || xElement2 == null)
                 return false;
 
@@ -211,10 +219,10 @@ namespace GillSoft.XmlComparer
             if (!xElement1.HasAttributes != xElement2.HasAttributes)
                 return false;
 
-            if (!xElement1.Attributes().Any(a1 => !xElement2.Attributes().Any(a2 => a2.Value == a1.Value)))
+            if (!xElement1.HasElements != xElement2.HasElements)
                 return false;
 
-            if (!xElement1.HasElements != xElement2.HasElements)
+            if (!xElement1.Attributes().Any(a1 => !xElement2.Attributes().Any(a2 => a2.Value == a1.Value)))
                 return false;
 
             return string.Equals(xElement1.Value, xElement2.Value);
@@ -247,7 +255,7 @@ namespace GillSoft.XmlComparer
                 if (attribute1 == null && attribute2 != null)
                 {
                     //added
-                    callback.AttributeAdded(attribute2.GetXPath() ,attribute2);
+                    callback.AttributeAdded(attribute2.GetXPath(), attribute2);
                     continue;
                 }
 
@@ -271,7 +279,7 @@ namespace GillSoft.XmlComparer
                     if (string.Equals(val1, val2))
                         continue;
 
-                    callback.AttributeChanged(attribute1.GetXPath(),attribute1, attribute2);
+                    callback.AttributeChanged(attribute1.GetXPath(), attribute1, attribute2);
                     continue;
                 }
 
