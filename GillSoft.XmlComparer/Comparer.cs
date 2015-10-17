@@ -73,12 +73,12 @@ namespace GillSoft.XmlComparer
                 .Select(a => new { Source = rightId, Element = a });
 
             var doc1DescendantsDiff = doc1Descendants
-                .Where(a => !doc2Descendants.Any(a2 => XNode.DeepEquals(a2.Element, a.Element)))
+                .Where(a => !doc2Descendants.Any(a2 => ElementsAreEqual(a2.Element, a.Element)))
                 .Select(a => Elem.Create(a.Element, a.Source))
                 .ToList();
 
             var doc2DescendantsDiff = doc2Descendants
-                .Where(a => !doc1Descendants.Any(a1 => XNode.DeepEquals(a1.Element, a.Element)))
+                .Where(a => !doc1Descendants.Any(a1 => ElementsAreEqual(a1.Element, a.Element)))
                 .Select(a => Elem.Create(a.Element, a.Source))
                 .ToList();
 
@@ -145,7 +145,7 @@ namespace GillSoft.XmlComparer
                     //xPathsToIgnore.AddRange(elems.Where(a => a.XPath.StartsWith(item.XPath)).Select(a => a.XPath));
                     xPathsToIgnore.Add(item.XPath);
 
-                    callback.ElementAdded(node2);
+                    callback.ElementAdded(item.XPath,node2);
                     continue;
                 }
 
@@ -156,7 +156,7 @@ namespace GillSoft.XmlComparer
                     //xPathsToIgnore.AddRange(elems.Where(a => a.XPath.StartsWith(item.XPath)).Select(a => a.XPath));
                     xPathsToIgnore.Add(item.XPath);
 
-                    callback.ElementRemoved(node1);
+                    callback.ElementRemoved(item.XPath, node1);
                     continue;
                 }
 
@@ -175,12 +175,35 @@ namespace GillSoft.XmlComparer
                     if (string.Equals(val1, val2))
                         continue;
 
-                    callback.ElementChanged(node1, node2);
+                    callback.ElementChanged(item.XPath, node1, node2);
                     continue;
                 }
 
                 throw new Exception("Invalid scenario while comparing elements: " + item.XPath);
             }
+        }
+
+        private bool ElementsAreEqual(XElement xElement1, XElement xElement2)
+        {
+            if (xElement1 == null && xElement2 == null)
+                return true;
+            
+            if (xElement1 == null || xElement2 == null)
+                return false;
+
+            if (xElement1.Name.ToString() != xElement2.Name.ToString())
+                return false;
+
+            if (!xElement1.HasAttributes != xElement2.HasAttributes)
+                return false;
+
+            if (!xElement1.Attributes().Any(a1 => !xElement2.Attributes().Any(a2 => a2.Value == a1.Value)))
+                return false;
+
+            if (!xElement1.HasElements != xElement2.HasElements)
+                return false;
+
+            return string.Equals(xElement1.Value, xElement2.Value);
         }
 
         public void Compare(string file1, string file2, IXmlCompareHandler callback)
@@ -210,7 +233,7 @@ namespace GillSoft.XmlComparer
                 if (attribute1 == null && attribute2 != null)
                 {
                     //added
-                    callback.AttributeAdded(attribute2);
+                    callback.AttributeAdded(attribute2.GetXPath() ,attribute2);
                     continue;
                 }
 
@@ -218,7 +241,7 @@ namespace GillSoft.XmlComparer
                 if (attribute1 != null && attribute2 == null)
                 {
                     //removed
-                    callback.AttributeRemoved(attribute1);
+                    callback.AttributeRemoved(attribute1.GetXPath(), attribute1);
                     continue;
                 }
 
@@ -234,7 +257,7 @@ namespace GillSoft.XmlComparer
                     if (string.Equals(val1, val2))
                         continue;
 
-                    callback.AttributeChanged(attribute1, attribute2);
+                    callback.AttributeChanged(attribute1.GetXPath(),attribute1, attribute2);
                     continue;
                 }
 

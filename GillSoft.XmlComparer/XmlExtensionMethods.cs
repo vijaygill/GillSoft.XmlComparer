@@ -11,6 +11,14 @@ namespace GillSoft.XmlComparer
 {
     public static class XmlExtensionMethods
     {
+        public static string FQN(this XAttribute element)
+        {
+            if (element == null)
+                return string.Empty;
+
+            return "@" + element.Name.LocalName;
+        }
+
         public static string FQN(this XElement element)
         {
             if (element == null)
@@ -84,6 +92,13 @@ namespace GillSoft.XmlComparer
                 }
             }
 
+            return res;
+        }
+        
+        public static string GetXPath(this XAttribute attribute)
+        {
+            var kvParent = attribute.Parent.GetBestKeyValueInfo();
+            var res = attribute.Parent.GetXPath(kvParent) + "/" + attribute.FQN();
             return res;
         }
 
