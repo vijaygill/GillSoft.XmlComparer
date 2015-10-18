@@ -13,14 +13,11 @@ namespace GillSoft.XmlComparer.ConsoleApp
         {
             try
             {
-                var file1 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\App.config";
-                var file2 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\GSSalesManager.exe.config";
+                var file1 = @".\TestFiles\a1.config";
+                var file2 = @".\TestFiles\a2.config";
 
-                file1 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\TheBrowBarLounge.csproj";
-                file2 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\TheBrowBarLounge.Deploy.csproj";
-
-                //file1 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\a1.config";
-                //file2 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\a2.config";
+                //file1 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\TheBrowBarLounge.csproj";
+                //file2 = @"C:\Temp\Dev\GillSoft.XmlComparer\Test\TheBrowBarLounge.Deploy.csproj";
 
                 var p = new Program();
 
