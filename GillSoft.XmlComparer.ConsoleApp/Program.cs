@@ -7,7 +7,7 @@ using System.Xml.Linq;
 
 namespace GillSoft.XmlComparer.ConsoleApp
 {
-    class Program : IXmlCompareHandler
+    class Program 
     {
         static void Main(string[] args)
         {
@@ -16,11 +16,11 @@ namespace GillSoft.XmlComparer.ConsoleApp
                 var file1 = @".\TestFiles\a1.config";
                 var file2 = @".\TestFiles\a2.config";
 
-                var p = new Program();
+                var handler = new TestXmlCompareHandler();
 
-                using (var comparer = new XmlComparer.Comparer(p))
+                using (var comparer = new Comparer(handler))
                 {
-                    comparer.Compare(file1, file2, p);
+                    comparer.Compare(file1, file2, handler);
                 }
             }
             catch (Exception ex)
@@ -31,51 +31,5 @@ namespace GillSoft.XmlComparer.ConsoleApp
             Console.ReadLine();
         }
 
-
-
-        public void ElementAdded(ElementAddedEventArgs e)
-        {
-            Console.WriteLine("++E: {0,-8}: {1}", e.LineNumber, e.XPath);
-            Console.WriteLine("   : {0}", e.Element);
-            Console.WriteLine();
-        }
-
-        public void ElementRemoved(ElementRemovedEventArgs e)
-        {
-            Console.WriteLine("--E: {0,-8}: {1}", e.LineNumber, e.XPath);
-            Console.WriteLine("   : {0}", e.Element);
-            Console.WriteLine();
-        }
-
-        public void ElementChanged(ElementChangedEventArgs e)
-        {
-            Console.WriteLine("<>E: {0}", e.XPath);
-            Console.WriteLine("  o: {0,-8}: {1}", e.LeftLineNumber, e.LeftElement.Value);
-            Console.WriteLine("  n: {0,-8}: {1}", e.RightLineNumber, e.RightElement.Value);
-            Console.WriteLine();
-        }
-
-        public void AttributeAdded(AttributeAddedEventArgs e)
-        {
-            Console.WriteLine("++A: {0,-8}: {1}", e.LineNumber, e.XPath);
-            Console.WriteLine("   : {0}", e.Attribute.Value);
-            Console.WriteLine();
-        }
-
-        public void AttributeRemoved(AttributeRemovedEventArgs e)
-        {
-            Console.WriteLine("--A: {0,-8}: {1}", e.LineNumber, e.XPath);
-            Console.WriteLine("   : {0}", e.Attribute.Value);
-            Console.WriteLine();
-        }
-
-        public void AttributeChanged(AttributeChangedEventArgs e)
-        {
-            Console.WriteLine("<>A: {0}", e.XPath);
-            Console.WriteLine("  o: {0,-8}: {1}", e.LeftLineNumber, e.LeftAttribute.Value);
-            Console.WriteLine("  n: {0,-8}: {1}", e.RightLineNumber, e.RightAttribute.Value);
-
-            Console.WriteLine();
-        }
     }
 }
