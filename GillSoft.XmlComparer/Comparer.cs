@@ -259,7 +259,7 @@ namespace GillSoft.XmlComparer
         private void CompareAttributes(XElement node1, XElement node2, IXmlCompareHandler callback)
         {
             var attribs = node1.GetAttributes()
-                .Union(node2.GetAttributes())
+                .Concat(node2.GetAttributes())
                 .GroupBy(a => a.Name.ToString())
                 .Select(a => a.First());
 
