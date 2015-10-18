@@ -39,7 +39,7 @@ namespace GillSoft.XmlComparer.UnitTests
             return res;
         }
 
-        #region Tests without namespaces
+        #region General tests
 
         [Test]
         [Category(TestCategories.General)]
@@ -129,6 +129,11 @@ namespace GillSoft.XmlComparer.UnitTests
             mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Never);
 
         }
+
+
+        #endregion
+
+        #region Attribute tests
 
         [Test]
         [Category(TestCategories.NameValueElements)]
@@ -472,6 +477,10 @@ namespace GillSoft.XmlComparer.UnitTests
             Assert.AreEqual("new value in ns1", newValue2);
 
         }
+
+        #endregion
+
+        #region Element tests
 
         [Test]
         [Category(TestCategories.NameValueElements)]
