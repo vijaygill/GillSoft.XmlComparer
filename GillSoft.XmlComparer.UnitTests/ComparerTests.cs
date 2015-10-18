@@ -532,6 +532,67 @@ namespace GillSoft.XmlComparer.UnitTests
 
         [Test]
         [Category(TestCategories.NameValueElements)]
+        public void NameValueElement_ElementAdded_WithNamespace()
+        {
+            //Arrange
+
+            #region sample values
+
+            var xml1 = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<root>
+  <elem1>This is element 1</elem1>
+  <elem2>This is element 2</elem2>
+</root>
+";
+
+            var xml2 = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<root xmlns:ns1=""http://www.example.com/ns1"">
+  <elem1>This is element 1</elem1>
+  <elem2>This is element 2</elem2>
+  <add name=""name1"" value=""value1""/>
+  <ns1:add name=""name1 in ns1"" value=""value1 in ns1""/>
+</root>
+";
+
+            #endregion
+
+            var newValue1 = string.Empty;
+            var newValue2 = string.Empty;
+
+            var mockHandler = new Mock<IXmlCompareHandler>(MockBehavior.Strict);
+            mockHandler.Setup(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>())).Callback<ElementAddedEventArgs>((e) =>
+            {
+                if (e.Element.Name.Namespace == "")
+                {
+                    newValue1 = e.Element.ToString();
+                }
+                if (e.Element.Name.Namespace == "http://www.example.com/ns1")
+                {
+                    newValue2 = e.Element.ToString();
+                }
+            });
+
+            var comparer = new Comparer(mockHandler.Object);
+
+            //act
+            comparer.Compare(GetStream(xml1), GetStream(xml2), mockHandler.Object);
+
+            //assert
+
+            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<AttributeAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<AttributeChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<AttributeRemovedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>()), Times.Exactly(2));
+            mockHandler.Verify(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Never);
+
+            Assert.AreEqual(@"<add name=""name1"" value=""value1"" />", newValue1);
+            Assert.AreEqual(@"<ns1:add name=""name1 in ns1"" value=""value1 in ns1"" xmlns:ns1=""http://www.example.com/ns1"" />", newValue2);
+
+        }
+
+        [Test]
+        [Category(TestCategories.NameValueElements)]
         public void NameValueElement_ElementRemoved()
         {
             //Arrange
@@ -574,6 +635,67 @@ namespace GillSoft.XmlComparer.UnitTests
             mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Once);
 
             Assert.AreEqual(@"<add name=""name1"" value=""value1"" oldAttribute=""to be deleted"" />", oldValue);
+
+        }
+
+        [Test]
+        [Category(TestCategories.NameValueElements)]
+        public void NameValueElement_ElementRemoved_WithNamespace()
+        {
+            //Arrange
+
+            #region sample values
+
+            var xml1 = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<root xmlns:ns1=""http://www.example.com/ns1"">
+  <elem1>This is element 1</elem1>
+  <elem2>This is element 2</elem2>
+  <ns1:add name=""name1 in ns1"" value=""value1 in ns1""/>
+  <add name=""name1"" value=""value1""/>
+</root>
+";
+
+            var xml2 = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<root>
+  <elem1>This is element 1</elem1>
+  <elem2>This is element 2</elem2>
+</root>
+";
+
+            #endregion
+
+            var oldValue1 = string.Empty;
+            var oldValue2 = string.Empty;
+
+            var mockHandler = new Mock<IXmlCompareHandler>(MockBehavior.Strict);
+            mockHandler.Setup(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>())).Callback<ElementRemovedEventArgs>((e) =>
+            {
+                if (e.Element.Name.Namespace == "")
+                {
+                    oldValue1 = e.Element.ToString();
+                }
+                if (e.Element.Name.Namespace == "http://www.example.com/ns1")
+                {
+                    oldValue2 = e.Element.ToString();
+                }
+            });
+
+            var comparer = new Comparer(mockHandler.Object);
+
+            //act
+            comparer.Compare(GetStream(xml1), GetStream(xml2), mockHandler.Object);
+
+            //assert
+
+            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<AttributeAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<AttributeChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<AttributeRemovedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Exactly(2));
+
+            Assert.AreEqual(@"<add name=""name1"" value=""value1"" />", oldValue1);
+            Assert.AreEqual(@"<ns1:add name=""name1 in ns1"" value=""value1 in ns1"" xmlns:ns1=""http://www.example.com/ns1"" />", oldValue2);
 
         }
 
@@ -723,6 +845,74 @@ namespace GillSoft.XmlComparer.UnitTests
 
         [Test]
         [Category(TestCategories.GeneralElements)]
+        public void GeneralElement_ElementChanged_WithNamespace()
+        {
+            //Arrange
+
+            #region sample values
+
+            var xml1 = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<root xmlns:ns1=""http://www.example.com/ns1"">
+  <elem1 name=""MyLogger"">This is element 1</elem1>
+  <elem2>This is element 2</elem2>
+  <ns1:elem2>This is element 2 in ns1</ns1:elem2>
+</root>
+";
+
+            var xml2 = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<root xmlns:ns1=""http://www.example.com/ns1"">
+  <elem1 name=""MyLogger"">This is element 1 but changed now</elem1>
+  <elem2>This is element 2</elem2>
+  <ns1:elem2>This is element 2 in ns1 but changed now</ns1:elem2>
+</root>
+";
+            #endregion
+
+            var oldValue1 = string.Empty;
+            var newValue1 = string.Empty;
+
+            var oldValue2 = string.Empty;
+            var newValue2 = string.Empty;
+
+            var mockHandler = new Mock<IXmlCompareHandler>(MockBehavior.Strict);
+            mockHandler.Setup(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()))
+                .Callback<ElementChangedEventArgs>((e) =>
+                {
+                    if (e.LeftElement.Name.Namespace == "")
+                    {
+                        oldValue1 = e.LeftElement.ToString(); 
+                        newValue1 = e.RightElement.ToString();
+                    }
+                    if (e.LeftElement.Name.Namespace == "http://www.example.com/ns1")
+                    {
+                        oldValue2 = e.LeftElement.ToString();
+                        newValue2 = e.RightElement.ToString();
+                    }
+                });
+
+            var comparer = new Comparer(mockHandler.Object);
+
+            //act
+            comparer.Compare(GetStream(xml1), GetStream(xml2), mockHandler.Object);
+
+            //assert
+
+            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<AttributeAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<AttributeChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<AttributeRemovedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()), Times.Exactly(2));
+            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Never);
+
+            Assert.AreEqual(@"<elem1 name=""MyLogger"">This is element 1</elem1>", oldValue1);
+            Assert.AreEqual(@"<elem1 name=""MyLogger"">This is element 1 but changed now</elem1>", newValue1);
+            Assert.AreEqual(@"<ns1:elem2 xmlns:ns1=""http://www.example.com/ns1"">This is element 2 in ns1</ns1:elem2>", oldValue2);
+            Assert.AreEqual(@"<ns1:elem2 xmlns:ns1=""http://www.example.com/ns1"">This is element 2 in ns1 but changed now</ns1:elem2>", newValue2);
+
+        }
+
+        [Test]
+        [Category(TestCategories.GeneralElements)]
         public void GeneralElement_ChildElementChanged()
         {
             //Arrange
@@ -731,17 +921,15 @@ namespace GillSoft.XmlComparer.UnitTests
 
             var xml1 = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
 <root>
-  <elem1 name=""MyLogger""><child>This is element 1</child></elem1>
-  <elem2>This is element 2</elem2>
-<add name=""name1"" value=""value1"" oldAttribute=""to be deleted""/>
+  <elem3 attr1=""attr1""><child>This is old child in element 3</child></elem3>
+  <add name=""name1"" value=""value1"" oldAttribute=""to be deleted""/>
 </root>
 ";
 
             var xml2 = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
 <root>
-  <elem1 name=""MyLogger""><child>This is element 1 but changed now</child></elem1>
-  <elem2>This is element 2</elem2>
-<add name=""name1"" value=""value1"" oldAttribute=""to be deleted""/>
+  <elem3 attr1=""attr1""><child>This is new child in element 3</child></elem3>
+  <add name=""name1"" value=""value1"" oldAttribute=""to be deleted""/>
 </root>
 ";
             #endregion
@@ -767,7 +955,105 @@ namespace GillSoft.XmlComparer.UnitTests
             mockHandler.Verify(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()), Times.Once);
             mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Never);
 
-            Assert.AreEqual(@"<child>This is element 1 but changed now</child>", newValue);
+            Assert.AreEqual(@"<child>This is new child in element 3</child>", newValue);
+
+        }
+
+        [Test]
+        [Category(TestCategories.GeneralElements)]
+        public void GeneralElement_ChildElementChanged_WithNamespace()
+        {
+            //Arrange
+
+            #region sample values
+
+            var xml1 = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<root xmlns:ns1=""http://www.example.com/ns1"">
+   <elem1>This does not change</elem1>
+  <ns1:elem3 attr1=""attr1""><child>This is old child in element 3</child></ns1:elem3>
+</root>
+";
+
+            var xml2 = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<root xmlns:ns1=""http://www.example.com/ns1"">
+   <elem1>This does not change</elem1>
+  <ns1:elem3 attr1=""attr1""><child>This is new child in element 3</child></ns1:elem3>
+</root>
+";
+
+            #endregion
+
+            var oldValue = string.Empty;
+            var newValue = string.Empty;
+
+            var mockHandler = new Mock<IXmlCompareHandler>(MockBehavior.Strict);
+            mockHandler.Setup(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()))
+                .Callback<ElementChangedEventArgs>((e) => { oldValue = e.LeftElement.ToString(); newValue = e.RightElement.ToString(); });
+
+            var comparer = new Comparer(mockHandler.Object);
+
+            //act
+            comparer.Compare(GetStream(xml1), GetStream(xml2), mockHandler.Object);
+
+            //assert
+
+            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<AttributeAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<AttributeChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<AttributeRemovedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()), Times.Once);
+            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Never);
+
+            Assert.AreEqual(@"<child>This is new child in element 3</child>", newValue);
+
+        }
+
+        [Test]
+        [Category(TestCategories.GeneralElements)]
+        public void GeneralElement_ChildElementChanged_WithDifferentNamespace()
+        {
+            //Arrange
+
+            #region sample values
+
+            var xml1 = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<root xmlns:ns1=""http://www.example.com/ns1"" xmlns:ns2=""http://www.example.com/ns2"">
+   <elem1>This does not change</elem1>
+  <ns1:elem3 attr1=""attr1""><ns2:child>This is old child in element 3</ns2:child></ns1:elem3>
+</root>
+";
+
+            var xml2 = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+<root xmlns:ns1=""http://www.example.com/ns1"" xmlns:ns2=""http://www.example.com/ns2"">
+   <elem1>This does not change</elem1>
+  <ns1:elem3 attr1=""attr1""><ns2:child>This is new child in element 3</ns2:child></ns1:elem3>
+</root>
+";
+
+            #endregion
+
+            var oldValue = string.Empty;
+            var newValue = string.Empty;
+
+            var mockHandler = new Mock<IXmlCompareHandler>(MockBehavior.Strict);
+            mockHandler.Setup(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()))
+                .Callback<ElementChangedEventArgs>((e) => { oldValue = e.LeftElement.ToString(); newValue = e.RightElement.ToString(); });
+
+            var comparer = new Comparer(mockHandler.Object);
+
+            //act
+            comparer.Compare(GetStream(xml1), GetStream(xml2), mockHandler.Object);
+
+            //assert
+
+            mockHandler.Verify(a => a.AttributeAdded(It.IsAny<AttributeAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeChanged(It.IsAny<AttributeChangedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.AttributeRemoved(It.IsAny<AttributeRemovedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementAdded(It.IsAny<ElementAddedEventArgs>()), Times.Never);
+            mockHandler.Verify(a => a.ElementChanged(It.IsAny<ElementChangedEventArgs>()), Times.Once);
+            mockHandler.Verify(a => a.ElementRemoved(It.IsAny<ElementRemovedEventArgs>()), Times.Never);
+
+            Assert.AreEqual(@"<ns2:child xmlns:ns2=""http://www.example.com/ns2"">This is new child in element 3</ns2:child>", newValue);
 
         }
 
